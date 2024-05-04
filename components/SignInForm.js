@@ -1,18 +1,54 @@
-import { StyleSheet, Text, View } from "react-native";
-import React from "react";
-import { FontAwesome, Feather } from "@expo/vector-icons";
+import { StyleSheet } from "react-native";
+import React, { useCallback, useReducer } from "react";
+import { Feather } from "@expo/vector-icons";
 import Submitbutton from "../components/Submitbutton";
 import Input from "../components/Input";
+import { validateInput } from "../utils/actions/formAction";
+import { reducer } from "../utils/reducers/formReducer";
+
+const initialState = {
+  inputValidities: {
+    email: false,
+    password: false,
+  },
+  formIsValid: false,
+};
 
 const SignInForm = () => {
+  const [formState, dispatchFormState] = useReducer(reducer, initialState);
+  const inputChangeHandler = useCallback((inputId, inputValue) => {
+    const result = validateInput(inputId, inputValue);
+    dispatchFormState({
+      inputId,
+      validationResult: result,
+    });
+  });
   return (
     <>
-      <Input label="Email" icon="mail" iconPack={Feather} />
-      <Input label="Password" icon="lock" iconPack={Feather} />
+      <Input
+        id="email"
+        label="Email"
+        icon="mail"
+        iconPack={Feather}
+        autCapitalize="none"
+        inputChangeHandler={inputChangeHandler}
+        keyboardType="email-address"
+        errorText={formState.inputValidities["email"]}
+      />
+      <Input
+        id="password"
+        label="Password"
+        icon="lock"
+        iconPack={Feather}
+        inputChangeHandler={inputChangeHandler}
+        autCapitalize="none"
+        errorText={formState.inputValidities["password"]}
+      />
       <Submitbutton
         title="Sign in"
         onPress={() => {}}
         style={{ marginTop: 20 }}
+        disabled={!formState.formIsValid}
       />
     </>
   );
