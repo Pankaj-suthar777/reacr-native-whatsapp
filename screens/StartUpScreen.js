@@ -18,7 +18,7 @@ const StartUpScreen = () => {
       }
       const parsedData = JSON.parse(storeAuthInfo);
       const { token, userId, expiryDate: expiryDateString } = parsedData;
-      const expiryDate = new Date(expiryDate);
+      const expiryDate = new Date(expiryDateString);
       if (expiryDate <= new Date() || !token || !userId) {
         dispatch(setDidTryAutoLogin());
         return;

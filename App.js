@@ -7,6 +7,7 @@ import * as Font from "expo-font";
 import AppNavigator from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const fonts = {
   black: require("./assets/fonts//Roboto-Black.ttf"),
@@ -27,7 +28,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsLoaded, setAppIsLoaded] = useState(false);
-
+  // AsyncStorage.clear();
   useEffect(() => {
     async function prepare() {
       try {
