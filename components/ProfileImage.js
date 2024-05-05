@@ -1,47 +1,75 @@
-import { Image, StyleSheet, View } from "react-native";
+import {
+  ActivityIndicator,
+  TouchableOpacity,
+  Image,
+  StyleSheet,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import colors from "../constants/colors";
 import { FontAwesome } from "@expo/vector-icons";
-import { TouchableOpacity } from "react-native-gesture-handler";
 import {
   launchImagePicker,
   uploadImageAsync,
 } from "../utils/imagePickerHelper";
 import { updateSignedInUserData } from "../utils/actions/authActions";
+import { useDispatch } from "react-redux";
+import { updateLoggedInData } from "../store/authSlice";
 const userImage = require("../assets/images/10.1 userImage.jpeg");
 
 const ProfileImage = (props) => {
+  const dispatch = useDispatch();
   const source = props.uri ? { uri: props.uri } : userImage;
   const [image, setImage] = useState(source);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const showEditButton = props.showEditButton && props.showEditButton === true;
   const pickImage = async () => {
     try {
       const tempUri = await launchImagePicker();
       if (!tempUri) return;
-
+      setIsLoading(true);
       const uploadUri = await uploadImageAsync(tempUri);
+      setIsLoading(false);
       if (!uploadUri) {
         throw new Error("Could not upload image");
       }
-      console.log(uploadUri);
+
       const userId = props.userId;
       await updateSignedInUserData(userId, { profilePicture: uploadUri });
-
+      dispatch(updateLoggedInData({ profilePicture: uploadUri }));
       setImage({ uri: uploadUri });
-    } catch (error) {}
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
+  const Conatiner = showEditButton ? TouchableOpacity : View;
   return (
-    <TouchableOpacity onPress={pickImage}>
-      <Image
-        style={{
-          ...styles.image,
-          ...{ width: props.size, height: props.size },
-        }}
-        source={image}
-      />
-      <View style={styles.editIconContainer}>
-        <FontAwesome name="pencil" size={15} color={"black"} />
-      </View>
-    </TouchableOpacity>
+    <Conatiner onPress={pickImage}>
+      {isLoading ? (
+        <View
+          height={props.size}
+          width={props.size}
+          style={styles.loadingContainer}
+        >
+          <ActivityIndicator size={"small"} color={colors.primary} />
+        </View>
+      ) : (
+        <Image
+          style={{
+            ...styles.image,
+            ...{ width: props.size, height: props.size },
+          }}
+          source={image}
+        />
+      )}
+
+      {showEditButton && !isLoading && (
+        <View style={styles.editIconContainer}>
+          <FontAwesome name="pencil" size={15} color={"black"} />
+        </View>
+      )}
+    </Conatiner>
   );
 };
 
@@ -60,5 +88,9 @@ const styles = StyleSheet.create({
     backgroundColor: colors.lightgray,
     borderRadius: 20,
     padding: 8,
+  },
+  loadingContainer: {
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
