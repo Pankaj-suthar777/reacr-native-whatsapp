@@ -1,20 +1,27 @@
 export const reducer = (state, action) => {
-  const { validationResult, inputId } = action;
+  const { validationResult, inputId, inputValue } = action;
 
-  const updateValidities = {
+  const updateValues = {
+    ...state.inputValues,
+    [inputId]: inputValue,
+  };
+
+  const updatedValidities = {
     ...state.inputValidities,
     [inputId]: validationResult,
   };
-
   let updatedFormIsValid = true;
-  for (const key in updateValidities) {
-    if (updateValidities[key] !== undefined) {
+
+  for (const key in updatedValidities) {
+    if (updatedValidities[key] !== undefined) {
       updatedFormIsValid = false;
       break;
     }
   }
+
   return {
-    inputValidities: updateValidities,
+    inputValues: updateValues,
+    inputValidities: updatedValidities,
     formIsValid: updatedFormIsValid,
   };
 };

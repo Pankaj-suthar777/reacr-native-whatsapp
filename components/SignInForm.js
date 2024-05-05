@@ -7,6 +7,10 @@ import { validateInput } from "../utils/actions/formAction";
 import { reducer } from "../utils/reducers/formReducer";
 
 const initialState = {
+  inputValues: {
+    email: false,
+    password: false,
+  },
   inputValidities: {
     email: false,
     password: false,
@@ -21,8 +25,12 @@ const SignInForm = () => {
     dispatchFormState({
       inputId,
       validationResult: result,
+      inputValue,
     });
   });
+
+  const authHandler = () => {};
+
   return (
     <>
       <Input
@@ -46,7 +54,7 @@ const SignInForm = () => {
       />
       <Submitbutton
         title="Sign in"
-        onPress={() => {}}
+        onPress={authHandler}
         style={{ marginTop: 20 }}
         disabled={!formState.formIsValid}
       />

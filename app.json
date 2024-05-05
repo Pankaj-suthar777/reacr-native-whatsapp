@@ -1,5 +1,8 @@
 {
   "expo": {
+    "packagerOpts": {
+      "sourceExts": ["cjs"]
+    },
     "name": "rn-whatsAppchat-app",
     "slug": "rn-whatsAppchat-app",
     "version": "1.0.0",
