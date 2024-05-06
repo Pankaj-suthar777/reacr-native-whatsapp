@@ -7,6 +7,7 @@ const colors = {
   primary: "#32d48e",
   red: "#e74c3c",
   extraLightGray: "#ededed",
+  beige: "#FEF5C3",
 };
 
 export default colors;
