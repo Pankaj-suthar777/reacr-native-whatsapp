@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   TextInput,
   ActivityIndicator,
   FlatList,
@@ -48,15 +47,15 @@ const NewChatScreen = (props) => {
         return;
       }
       setIsLoading(true);
-      const userResult = await searchUser(searchTerm);
-      delete userResult[userData.userId];
-      setUsers(userResult);
+      const usersResult = await searchUser(searchTerm);
+      delete usersResult[userData.userId];
+      setUsers(usersResult);
 
-      if (Object.keys(userResult).length === 0) {
+      if (Object.keys(usersResult).length === 0) {
         setNoResultFound(true);
       } else {
         setNoResultFound(false);
-        dispatch(setStoredUsers({ newUsers: userResult }));
+        dispatch(setStoredUsers({ newUsers: usersResult }));
       }
 
       setIsLoading(false);

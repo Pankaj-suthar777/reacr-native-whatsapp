@@ -3,12 +3,20 @@ import React, { useEffect } from "react";
 import { HeaderButtons, Item } from "react-navigation-header-buttons";
 import CustomHeaderButton from "../components/CustomHeaderButton";
 import { useSelector } from "react-redux";
+import DataItem from "../components/DataItem,";
+import PageContainer from "../components/PageContainer";
+import PageTitle from "../components/PageTitle";
 const ChatListScreen = (props) => {
   const selectedUser = props.route?.params?.selectedUserId;
   const userData = useSelector((state) => state.auth.userData);
+
+  const storedUsers = useSelector((state) => state.users.storedUsers);
+
   const userChats = useSelector((state) => {
     const chatsData = state.chats.chatsData;
-    return Object.values(chatsData);
+    return Object.values(chatsData).sort((a, b) => {
+      return new Date(b.updatedAt) - new Date(a.updatedAt);
+    });
   });
 
   useEffect(() => {
@@ -43,16 +51,37 @@ const ChatListScreen = (props) => {
     props.navigation.navigate("ChatScreen", navigationProps);
   }, [props.route?.params]);
   return (
-    <FlatList
-      data={userChats}
-      renderItem={({ itemData }) => {
-        const chatData = itemData.item;
-        const otherUserId = chatData.users.find(
-          (uid) => uid !== userData.userId
-        );
-        return;
-      }}
-    />
+    <PageContainer>
+      <PageTitle title="Chats" />
+      <FlatList
+        data={userChats}
+        renderItem={(itemData) => {
+          const chatData = itemData.item;
+          const chatId = chatData.key;
+
+          const otherUserId = chatData.users.find(
+            (uid) => uid !== userData.userId
+          );
+          const otherUser = storedUsers[otherUserId];
+
+          if (!otherUser) return;
+
+          const title = `${otherUser?.firstName} ${otherUser?.lastName}`;
+          const subTitle = otherUser?.latestMessageText || "New Chat";
+          const image = otherUser?.profilePicture;
+          return (
+            <DataItem
+              title={title}
+              subTitle={subTitle}
+              image={image}
+              onPress={() =>
+                props.navigation.navigate("ChatScreen", { chatId })
+              }
+            />
+          );
+        }}
+      />
+    </PageContainer>
   );
 };
 const styles = StyleSheet.create({

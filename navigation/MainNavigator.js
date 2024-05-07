@@ -10,11 +10,13 @@ import NewChatScreen from "../screens/NewChatScreen";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useDispatch, useSelector } from "react-redux";
 import { getFirebaseApp } from "../utils/firbaseHelper";
-import { child, getDatabase, off, onValue, ref } from "firebase/database";
+import { child, get, getDatabase, off, onValue, ref } from "firebase/database";
 import { setChatsData } from "../store/chatSlice";
 import { ActivityIndicator, View } from "react-native";
 import colors from "../constants/colors";
 import { commonStyle } from "../constants/commonStyle";
+import { setStoredUsers } from "../store/userSlice";
+import { setChatMessages } from "../store/messagesSlice";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -95,35 +97,53 @@ const MainNavigator = (props) => {
   useEffect(() => {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
-    const usersChatsRef = child(dbRef, `userChats/${userData.userId}`);
+    const usersChatsRef = child(dbRef, `userChats/${userData?.userId}`);
     const refs = [usersChatsRef];
     onValue(usersChatsRef, (quarySnapshot) => {
-      const chatsIDsData = quarySnapshot.val() || {};
-      const chatsIds = Object.values(chatsIDsData);
+      const chatsIdsData = quarySnapshot.val() || {};
+      const chatIds = Object.values(chatsIdsData);
 
       let chatsData = {};
       let chatsFoundCount = 0;
 
-      for (let i = 0; i < chatsIds.length; i++) {
-        const chatId = chatsIds[i];
+      for (let i = 0; i < chatIds.length; i++) {
+        const chatId = chatIds[i];
         const chatRef = child(dbRef, `chats/${chatId}`);
         refs.push(chatRef);
 
         onValue(chatRef, (chatSnapShots) => {
           chatsFoundCount++;
-          let data = chatSnapShots.val();
+          const data = chatSnapShots.val();
 
           if (data) {
             data.key = chatSnapShots.key;
+
+            data.users.forEach((userId) => {
+              if (storedUsers[userId]) return;
+
+              const userRef = child(dbRef, `users/${userId}`);
+
+              get(userRef).then((userSnapshot) => {
+                const userSnapshotData = userSnapshot.val();
+                dispatch(setStoredUsers({ newUsers: { userSnapshotData } }));
+              });
+
+              refs.push(userRef);
+            });
             chatsData[chatSnapShots.key] = data;
           }
 
-          console.log(data);
-
-          if (chatsFoundCount >= chatsIds.length) {
+          if (chatsFoundCount >= chatIds.length) {
             dispatch(setChatsData({ chatsData }));
             setIsLoading(false);
           }
+        });
+
+        const messageRef = child(dbRef, `messages/${chatId}`);
+        refs.push(messageRef);
+        onValue(messageRef, (messagesSnapshot) => {
+          const messageData = messagesSnapshot.val();
+          dispatch(setChatMessages({ chatId, messageData }));
         });
 
         if (chatsFoundCount == 0) {
@@ -139,13 +159,14 @@ const MainNavigator = (props) => {
     };
   }, []);
 
-  if (isLoading) {
-    return (
-      <View style={commonStyle.center}>
-        <ActivityIndicator color={colors.primary} size={"large"} />
-      </View>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <View style={commonStyle.center}>
+  //       <ActivityIndicator color={colors.primary} size={"large"} />
+  //     </View>
+  //   );
+  // }
+
   return <StackNavigator />;
 };
 
