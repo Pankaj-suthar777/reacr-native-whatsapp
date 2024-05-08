@@ -8,6 +8,7 @@ import AppNavigator from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { MenuProvider } from "react-native-popup-menu";
 
 const fonts = {
   black: require("./assets/fonts//Roboto-Black.ttf"),
@@ -55,7 +56,9 @@ export default function App() {
   return (
     <Provider store={store}>
       <SafeAreaProvider onLayout={onLayout} style={styles.container}>
-        <AppNavigator />
+        <MenuProvider>
+          <AppNavigator />
+        </MenuProvider>
       </SafeAreaProvider>
     </Provider>
   );

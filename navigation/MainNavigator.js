@@ -143,7 +143,7 @@ const MainNavigator = (props) => {
         refs.push(messageRef);
         onValue(messageRef, (messagesSnapshot) => {
           const messageData = messagesSnapshot.val();
-          dispatch(setChatMessages({ chatId, messageData }));
+          dispatch(setChatMessages({ chatId, messagesData: messageData }));
         });
 
         if (chatsFoundCount == 0) {

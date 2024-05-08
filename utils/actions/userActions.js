@@ -25,6 +25,7 @@ export const getUserData = async (userId) => {
 
 export const searchUser = async (quaryText) => {
   const serachTerm = quaryText.toLowerCase();
+
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
