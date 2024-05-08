@@ -16,7 +16,7 @@ import { ActivityIndicator, View } from "react-native";
 import colors from "../constants/colors";
 import { commonStyle } from "../constants/commonStyle";
 import { setStoredUsers } from "../store/userSlice";
-import { setChatMessages } from "../store/messagesSlice";
+import { setChatMessages, setStarMessages } from "../store/messagesSlice";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -102,7 +102,6 @@ const MainNavigator = (props) => {
     onValue(usersChatsRef, (quarySnapshot) => {
       const chatsIdsData = quarySnapshot.val() || {};
       const chatIds = Object.values(chatsIdsData);
-
       let chatsData = {};
       let chatsFoundCount = 0;
 
@@ -152,6 +151,16 @@ const MainNavigator = (props) => {
       }
     });
 
+    const userStarredMessagesRef = child(
+      dbRef,
+      `userStarredMessages/${userData.userId}`
+    );
+
+    refs.push(userStarredMessagesRef);
+    onValue(userStarredMessagesRef, (quarySnapshot) => {
+      const starredMessages = quarySnapshot.val() ?? {};
+      dispatch(setStarMessages({ starredMessages: starredMessages }));
+    });
     return () => {
       refs.forEach((ref) => {
         off(ref);
@@ -159,13 +168,13 @@ const MainNavigator = (props) => {
     };
   }, []);
 
-  // if (isLoading) {
-  //   return (
-  //     <View style={commonStyle.center}>
-  //       <ActivityIndicator color={colors.primary} size={"large"} />
-  //     </View>
-  //   );
-  // }
+  if (isLoading) {
+    return (
+      <View style={commonStyle.center}>
+        <ActivityIndicator color={colors.primary} size={"large"} />
+      </View>
+    );
+  }
 
   return <StackNavigator />;
 };

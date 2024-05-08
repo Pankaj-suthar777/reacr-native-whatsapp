@@ -16,7 +16,8 @@ import {
 import uuid from "react-native-uuid";
 import * as Clipboard from "expo-clipboard";
 import { Feather, FontAwesome } from "@expo/vector-icons";
-
+import { starMessage } from "../utils/actions/chatActions";
+import { useSelector } from "react-redux";
 const MenuItem = (props) => {
   const Icon = props.iconPack ?? Feather;
   return (
@@ -29,8 +30,36 @@ const MenuItem = (props) => {
   );
 };
 
+function formatAmPm(dateString) {
+  let date = new Date(dateString);
+  let hours = date.getHours();
+  let minutes = date.getMinutes();
+  let ampm = hours >= 12 ? "pm" : "am";
+  hours = hours % 12;
+  hours = hours ? hours : 12; // the hour '0' should be '12'
+  minutes = minutes < 10 ? "0" + minutes : minutes;
+  return (strTime = hours + ":" + minutes + " " + ampm);
+}
+
 const Bubble = (props) => {
-  const { text, type } = props;
+  const {
+    text,
+    type,
+    messageId,
+    chatId,
+    userId,
+    date,
+    setReplyingTo,
+    replyingTo,
+    name,
+  } = props;
+
+  const storedUsers = useSelector((state) => state.users.storedUsers);
+
+  const starredMessages = useSelector(
+    (state) => state.messages.starredMessages[chatId] ?? {}
+  );
+
   const bubbleStyle = { ...styles.container };
   const textStyle = { ...styles.text };
   const wrapperStyle = { ...styles.wrapperStyle };
@@ -40,6 +69,10 @@ const Bubble = (props) => {
 
   let Container = View;
 
+  let isUserMessage = false;
+
+  const dateString = date && formatAmPm(date);
+
   switch (type) {
     case "system":
       textStyle.color = "#65644A";
@@ -48,7 +81,6 @@ const Bubble = (props) => {
       bubbleStyle.marginTop = 10;
       break;
     case "error":
-      myMessage;
       bubbleStyle.backgroundColor = colors.red;
       textStyle.color = "#fff";
       bubbleStyle.marginTop = 10;
@@ -58,11 +90,19 @@ const Bubble = (props) => {
       bubbleStyle.backgroundColor = "#E7FED6";
       bubbleStyle.maxWidth = "90%";
       Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
     case "theirMessage":
       wrapperStyle.justifyContent = "flex-start";
       bubbleStyle.maxWidth = "90%";
       Container = TouchableWithoutFeedback;
+      isUserMessage = true;
+      break;
+    case "replay":
+      wrapperStyle.justifyContent = "flex-start";
+      bubbleStyle.backgroundColor = "#F2F2F2";
+      Container = TouchableWithoutFeedback;
+      isUserMessage = true;
       break;
     default:
       break;
@@ -72,8 +112,20 @@ const Bubble = (props) => {
     await Clipboard.setStringAsync(text);
   };
 
+  const isStarred = isUserMessage && starredMessages[messageId] !== undefined;
+
+  const replyingToUser = replyingTo && storedUsers[replyingTo.sentBy];
+
   return (
     <View style={wrapperStyle}>
+      {name && <Text style={styles.name}>{name}</Text>}
+      {replyingToUser && (
+        <Bubble
+          type="reply"
+          text={replyingTo.text}
+          name={`${replyingTo.firstName} ${replyingTo.lastName}`}
+        />
+      )}
       <Container
         onLongPress={() =>
           menuRef.current.props.ctx.menuActions.openMenu(id.current)
@@ -82,7 +134,19 @@ const Bubble = (props) => {
       >
         <View style={bubbleStyle}>
           <Text style={textStyle}>{text}</Text>
-
+          {dateString && (
+            <View style={styles.timeContainer}>
+              {isStarred && (
+                <FontAwesome
+                  name="star"
+                  size={14}
+                  color={colors.textColor}
+                  style={{ marginRight: 5 }}
+                />
+              )}
+              <Text style={styles.time}>{dateString}</Text>
+            </View>
+          )}
           <Menu name={id.current} ref={menuRef}>
             <MenuTrigger />
 
@@ -92,18 +156,20 @@ const Bubble = (props) => {
                 onSelect={() => copyToClipboard(text)}
                 icon="copy"
               />
-
               <MenuItem
-                text="Star message"
-                onSelect={() => copyToClipboard(text)}
+                text={`${isStarred ? "Unstar" : "Star"} message`}
+                onSelect={() => starMessage(messageId, chatId, userId)}
                 name="copy"
                 iconPack={FontAwesome}
-                icon={"star-o"}
+                icon={isStarred ? "star" : "star-o"}
               />
+
               <MenuItem
-                text="Copy to clipboard"
-                onSelect={() => copyToClipboard(text)}
+                text={"Reply"}
                 name="copy"
+                iconPack={Feather}
+                icon={"arrow-left-circle"}
+                onSelect={setReplyingTo}
               />
             </MenuOptions>
           </Menu>
@@ -142,4 +208,15 @@ const styles = StyleSheet.create({
     letterSpacing: 0.3,
     fontSize: 16,
   },
+  timeContainer: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
+  time: {
+    fontFamily: "regular",
+    letterSpacing: 0.3,
+    color: colors.gray,
+    fontSize: 12,
+  },
+  name: { fontFamily: "medium", letterSpacing: 0.3 },
 });

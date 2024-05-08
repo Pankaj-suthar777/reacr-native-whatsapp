@@ -18,12 +18,14 @@ import { useSelector } from "react-redux";
 import PageContainer from "../components/PageContainer";
 import Bubble from "../components/Bubble";
 import { createChat, sendTextMessage } from "../utils/actions/chatActions";
+import ReplayTo from "../components/ReplayTo";
 
 const ChatScreen = (props) => {
   const [chatUsers, setChatUsers] = useState([]);
   const [messageText, setMessageText] = useState("");
   const [chatId, setChatId] = useState(props.route?.params?.chatId);
   const [errorBannerText, setErrorBannerText] = useState("");
+  const [replyingTo, setReplyingTo] = useState("");
 
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users?.storedUsers);
@@ -40,7 +42,6 @@ const ChatScreen = (props) => {
     }
     return messageList;
   });
-  console.log(chatMessages);
   const chatData =
     (chatId && storedChats[chatId]) || props.route?.params?.newChatData;
 
@@ -52,8 +53,14 @@ const ChatScreen = (props) => {
         setChatId(id);
       }
 
-      await sendTextMessage(chatId, userData.userId, messageText);
+      await sendTextMessage(
+        chatId,
+        userData.userId,
+        messageText,
+        replyingTo && replyingTo.key
+      );
       setMessageText("");
+      setReplyingTo(null);
     } catch (error) {
       setErrorBannerText("Message failed to send");
       console.log(error);
@@ -95,11 +102,32 @@ const ChatScreen = (props) => {
                 const isOwnMessage = message.sentBy === userData.userId;
 
                 const messageType = isOwnMessage ? "myMessage" : "theirMessage";
-                return <Bubble type={messageType} text={message.text} />;
+                return (
+                  <Bubble
+                    type={messageType}
+                    text={message.text}
+                    messageId={message.key}
+                    userId={userData.userId}
+                    chatId={chatId}
+                    date={message.sentAt}
+                    setReplyingTo={() => setReplyingTo(message)}
+                    replyingTo={
+                      message.replayTo &&
+                      chatMessages.find((i) => i.key === message.replyingTo)
+                    }
+                  />
+                );
               }}
             />
           )}
         </PageContainer>
+        {replyingTo && (
+          <ReplayTo
+            text={replyingTo.text}
+            user={storedUsers[replyingTo.sentBy]}
+            onCancel={() => setReplyingTo(null)}
+          />
+        )}
       </ImageBackground>
       {/* <KeyboardAvoidingView
         style={styles.screen}

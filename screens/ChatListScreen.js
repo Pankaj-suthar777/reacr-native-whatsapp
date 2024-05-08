@@ -68,7 +68,6 @@ const ChatListScreen = (props) => {
 
           const title = `${otherUser?.firstName} ${otherUser?.lastName}`;
           const subTitle = chatData?.latestMessageText || "New Chat";
-          console.log("last message", chatData);
           const image = otherUser?.profilePicture;
           return (
             <DataItem

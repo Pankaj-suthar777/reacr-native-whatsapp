@@ -50,7 +50,6 @@ const NewChatScreen = (props) => {
       const usersResult = await searchUser(searchTerm);
       delete usersResult[userData.userId];
       setUsers(usersResult);
-
       if (Object.keys(usersResult).length === 0) {
         setNoResultFound(true);
       } else {

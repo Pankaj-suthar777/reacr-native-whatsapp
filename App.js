@@ -7,7 +7,6 @@ import * as Font from "expo-font";
 import AppNavigator from "./navigation/AppNavigator";
 import { Provider } from "react-redux";
 import { store } from "./store/store";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MenuProvider } from "react-native-popup-menu";
 
 const fonts = {
@@ -29,7 +28,7 @@ SplashScreen.preventAutoHideAsync();
 
 export default function App() {
   const [appIsLoaded, setAppIsLoaded] = useState(false);
-  //  AsyncStorage.clear();
+
   useEffect(() => {
     async function prepare() {
       try {
