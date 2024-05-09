@@ -7,8 +7,8 @@ const ReplayTo = (props) => {
   const { text, user, onCancel } = props;
   const name = `${user.firstName} ${user.lastName}`;
   return (
-    <View style={styles.conatainer}>
-      <View style={styles.textConatainer}>
+    <View style={styles.container}>
+      <View style={styles.textContainer}>
         <Text numberOfLines={1} style={styles.name}>
           {name}
         </Text>
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
     borderLeftColor: colors.blue,
     borderLeftWidth: 4,
   },
-  textConatainer: {
+  textContainer: {
     flex: 1,
     marginRight: 5,
   },

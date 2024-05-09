@@ -38,6 +38,20 @@ export const sendTextMessage = async (
   messageText,
   replyingTo
 ) => {
+  await sendMessage(chatId, senderId, messageText, null, replyingTo);
+};
+
+export const sendImage = async (chatId, senderId, imageUrl, replyingTo) => {
+  await sendMessage(chatId, senderId, "Image", imageUrl, replyingTo);
+};
+
+const sendMessage = async (
+  chatId,
+  senderId,
+  messageText,
+  imageUrl,
+  replyingTo
+) => {
   const app = getFirebaseApp();
   const dbRef = ref(getDatabase(app));
   const messageRef = child(dbRef, `messages/${chatId}`);
@@ -49,6 +63,10 @@ export const sendTextMessage = async (
   };
   if (replyingTo) {
     messageData.replyingTo = replyingTo;
+  }
+
+  if (imageUrl) {
+    messageData.imageUrl = imageUrl;
   }
   await push(messageRef, messageData);
 

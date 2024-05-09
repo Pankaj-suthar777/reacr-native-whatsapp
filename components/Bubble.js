@@ -1,4 +1,5 @@
 import {
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -52,6 +53,7 @@ const Bubble = (props) => {
     setReplyingTo,
     replyingTo,
     name,
+    imageUrl,
   } = props;
 
   const storedUsers = useSelector((state) => state.users.storedUsers);
@@ -98,11 +100,8 @@ const Bubble = (props) => {
       Container = TouchableWithoutFeedback;
       isUserMessage = true;
       break;
-    case "replay":
-      wrapperStyle.justifyContent = "flex-start";
+    case "reply":
       bubbleStyle.backgroundColor = "#F2F2F2";
-      Container = TouchableWithoutFeedback;
-      isUserMessage = true;
       break;
     default:
       break;
@@ -118,14 +117,6 @@ const Bubble = (props) => {
 
   return (
     <View style={wrapperStyle}>
-      {name && <Text style={styles.name}>{name}</Text>}
-      {replyingToUser && (
-        <Bubble
-          type="reply"
-          text={replyingTo.text}
-          name={`${replyingTo.firstName} ${replyingTo.lastName}`}
-        />
-      )}
       <Container
         onLongPress={() =>
           menuRef.current.props.ctx.menuActions.openMenu(id.current)
@@ -133,7 +124,19 @@ const Bubble = (props) => {
         style={{ width: "100%" }}
       >
         <View style={bubbleStyle}>
-          <Text style={textStyle}>{text}</Text>
+          {name && <Text style={styles.name}>{name}</Text>}
+          {replyingToUser && (
+            <Bubble
+              type="reply"
+              text={replyingTo.text}
+              name={`${replyingToUser.firstName} ${replyingToUser.lastName}`}
+            />
+          )}
+          {!imageUrl && <Text style={textStyle}>{text}</Text>}
+
+          {imageUrl && (
+            <Image source={{ uri: imageUrl }} style={styles.imageStyle} />
+          )}
           {dateString && (
             <View style={styles.timeContainer}>
               {isStarred && (
@@ -219,4 +222,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   name: { fontFamily: "medium", letterSpacing: 0.3 },
+  imageStyle: {
+    width: 300,
+    height: 300,
+    marginBottom: 5,
+  },
 });
