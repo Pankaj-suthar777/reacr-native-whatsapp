@@ -17,6 +17,7 @@ import colors from "../constants/colors";
 import { commonStyle } from "../constants/commonStyle";
 import { setStoredUsers } from "../store/userSlice";
 import { setChatMessages, setStarMessages } from "../store/messagesSlice";
+import ContactScreen from "../screens/ContactScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -71,7 +72,9 @@ const StackNavigator = () => {
           name="ChatSettings"
           component={ChatSettingScreen}
           options={{
-            headerTitle: "Settings",
+            headerTitle: "",
+            headerBackTitle: "Back",
+            headerShadowVisible: false,
           }}
         />
         <Stack.Screen
@@ -79,6 +82,14 @@ const StackNavigator = () => {
           component={ChatScreen}
           options={{
             headerTitle: "",
+          }}
+        />
+        <Stack.Screen
+          name="Contact"
+          component={ContactScreen}
+          options={{
+            headerTitle: "Contact Info",
+            headerBackTitle: "Back",
           }}
         />
       </Stack.Group>
