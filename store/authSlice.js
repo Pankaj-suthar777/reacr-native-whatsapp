@@ -28,9 +28,7 @@ const authSlice = createSlice({
   },
 });
 
-export const setDidTryAutoLogin = authSlice.actions.setDidTryAutoLogin;
-export const authenticate = authSlice.actions.authenticate;
-export const logout = authSlice.actions.logout;
-export const updateLoggedInData = authSlice.actions.updateLoggedInData;
+export const { setDidTryAutoLogin, authenticate, logout, updateLoggedInData } =
+  authSlice.actions;
 
 export default authSlice.reducer;

@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   ImageBackground,
   TextInput,
   TouchableOpacity,
@@ -70,7 +69,7 @@ const ChatScreen = (props) => {
       }
 
       await sendTextMessage(
-        chatId,
+        id,
         userData.userId,
         messageText,
         replyingTo && replyingTo.key
@@ -92,9 +91,11 @@ const ChatScreen = (props) => {
     );
   };
 
+  const title = (chatData = chatData.chatName ?? getChatTitleFromName());
+
   useEffect(() => {
     props.navigation.setOptions({
-      headerTitle: getChatTitleFromName(),
+      headerTitle: title,
     });
     setChatUsers(chatData.users);
   }, [chatUsers]);
@@ -144,6 +145,7 @@ const ChatScreen = (props) => {
       setIsLoading(false);
     }
   }, [isLoading, tempImageUri, chatId]);
+
   return (
     <SafeAreaView style={styles.container} edges={["right", "left", "bottom"]}>
       <ImageBackground
@@ -164,9 +166,13 @@ const ChatScreen = (props) => {
               data={chatMessages}
               renderItem={(itemData) => {
                 const message = itemData.item;
+
                 const isOwnMessage = message.sentBy === userData.userId;
 
                 const messageType = isOwnMessage ? "myMessage" : "theirMessage";
+
+                const sender = message.sentBy && storedUsers[message.sentBy];
+                const name = sender && `${sender.firstName} ${sender.lastName}`;
                 return (
                   <Bubble
                     type={messageType}
@@ -174,6 +180,9 @@ const ChatScreen = (props) => {
                     messageId={message.key}
                     userId={userData.userId}
                     chatId={chatId}
+                    name={
+                      !chatData.isGroupChat || isOwnMessage ? undefined : name
+                    }
                     date={message.sentAt}
                     setReplyingTo={() => setReplyingTo(message)}
                     replyingTo={

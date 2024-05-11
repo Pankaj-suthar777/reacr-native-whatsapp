@@ -89,7 +89,7 @@ const StackNavigator = () => {
   );
 };
 
-const MainNavigator = (props) => {
+const MainNavigator = () => {
   const dispatch = useDispatch();
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);

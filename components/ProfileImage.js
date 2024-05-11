@@ -24,6 +24,8 @@ const ProfileImage = (props) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const showEditButton = props.showEditButton && props.showEditButton === true;
+  const showRemoveButton =
+    props.showRemoveButton && props.showRemoveButton === true;
   const pickImage = async () => {
     try {
       const tempUri = await launchImagePicker();
@@ -43,9 +45,9 @@ const ProfileImage = (props) => {
       setIsLoading(false);
     }
   };
-  const Conatiner = showEditButton ? TouchableOpacity : View;
+  const Conatiner = props.onPress || showEditButton ? TouchableOpacity : View;
   return (
-    <Conatiner onPress={pickImage}>
+    <Conatiner style={props.style} onPress={props.onPress || pickImage}>
       {isLoading ? (
         <View
           height={props.size}
@@ -63,10 +65,15 @@ const ProfileImage = (props) => {
           source={image}
         />
       )}
-
       {showEditButton && !isLoading && (
         <View style={styles.editIconContainer}>
           <FontAwesome name="pencil" size={15} color={"black"} />
+        </View>
+      )}
+
+      {showRemoveButton && !isLoading && (
+        <View style={styles.removeIconContainer}>
+          <FontAwesome name="close" size={15} color={"black"} />
         </View>
       )}
     </Conatiner>
@@ -92,5 +99,13 @@ const styles = StyleSheet.create({
   loadingContainer: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  removeIconContainer: {
+    position: "absolute",
+    bottom: -3,
+    right: -3,
+    backgroundColor: colors.lightgray,
+    borderRadius: 20,
+    padding: 3,
   },
 });

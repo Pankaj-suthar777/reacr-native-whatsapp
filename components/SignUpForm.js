@@ -1,4 +1,4 @@
-import { ActivityIndicator, Alert, StyleSheet } from "react-native";
+import { ActivityIndicator, Alert } from "react-native";
 import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { FontAwesome, Feather } from "@expo/vector-icons";
 import Submitbutton from "../components/Submitbutton";
@@ -123,5 +123,3 @@ const SignUpForm = () => {
 };
 
 export default SignUpForm;
-
-const styles = StyleSheet.create({});

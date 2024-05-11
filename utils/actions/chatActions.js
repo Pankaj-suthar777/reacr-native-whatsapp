@@ -11,6 +11,7 @@ import {
 import { getFirebaseApp } from "../firbaseHelper";
 
 export const createChat = async (loggedInUserId, chatData) => {
+  // chatData =  { users : [myId,otherUserId]}
   const newChatData = {
     ...chatData,
     createdBy: loggedInUserId,
@@ -79,7 +80,6 @@ const sendMessage = async (
 };
 
 export const starMessage = async (messageId, chatId, userId) => {
-  // console.log(messageId, chatId, userId);
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));

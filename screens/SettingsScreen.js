@@ -22,7 +22,7 @@ import colors from "../constants/colors";
 import { updateLoggedInData } from "../store/authSlice";
 import ProfileImage from "../components/ProfileImage";
 
-const SettingsScreen = (props) => {
+const SettingsScreen = () => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
