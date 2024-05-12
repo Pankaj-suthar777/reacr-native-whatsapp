@@ -17,7 +17,7 @@ const ChatListScreen = (props) => {
   const selectedUser = props.route?.params?.selectedUserId;
 
   //for group chats
-  const selectedUserList = props.route?.params?.selectedUserList;
+  const selectedUserList = props.route?.params?.selectedUsers;
   const chatName = props.route?.params?.chatName;
 
   const userData = useSelector((state) => state.auth.userData);
@@ -91,9 +91,11 @@ const ChatListScreen = (props) => {
 
       <View>
         <TouchableOpacity
-          onPress={props.navigation.navigate("NewChat", {
-            isGroupChat: true,
-          })}
+          onPress={() =>
+            props.navigation.navigate("NewChat", {
+              isGroupChat: true,
+            })
+          }
         >
           <Text style={styles.newGroupText}>New Group</Text>
         </TouchableOpacity>

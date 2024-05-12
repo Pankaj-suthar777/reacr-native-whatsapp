@@ -26,7 +26,6 @@ const NewChatScreen = (props) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [chatName, setChatName] = useState("");
   const [selectedUsers, setSelectedUsers] = useState([]);
-
   const userData = useSelector((state) => state.auth.userData);
   const storedUsers = useSelector((state) => state.users.storedUsers);
 
@@ -52,7 +51,7 @@ const NewChatScreen = (props) => {
                 title="Create"
                 onPress={() => {
                   props.navigation.navigate("ChatList", {
-                    selectedUserList: selectedUsers,
+                    selectedUsers,
                     chatName,
                   });
                 }}
@@ -113,8 +112,6 @@ const NewChatScreen = (props) => {
               <TextInput
                 style={styles.textBox}
                 placeholder="Enter a name for your chat"
-                autoCorrect={false}
-                autoComplete={false}
                 onChangeText={(text) => setChatName(text)}
               />
             </View>
@@ -128,7 +125,7 @@ const NewChatScreen = (props) => {
               style={styles.selectedUsersList}
               data={selectedUsers}
               horizontal={true}
-              contentContainerStyle={{ alignItems: "center" }}
+              contentContainerStyle={{ alignItems: "center", height: 50 }}
               keyExtractor={(item) => item}
               renderItem={(itemData) => {
                 const userId = itemData.item;

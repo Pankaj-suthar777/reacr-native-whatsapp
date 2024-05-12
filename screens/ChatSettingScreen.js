@@ -12,10 +12,11 @@ import PageTitle from "../components/PageTitle";
 import ProfileImage from "../components/ProfileImage";
 import Input from "../components/Input";
 import { reducer } from "../utils/reducers/formReducer";
-import { validateLength } from "../utils/validationConstraints";
 import { updateChatData } from "../utils/actions/chatActions";
 import colors from "../constants/colors";
 import Submitbutton from "../components/Submitbutton";
+import { validateInput } from "../utils/actions/formAction";
+import DataItem from "../components/DataItem,";
 
 const ChatSettingScreen = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,8 @@ const ChatSettingScreen = (props) => {
   const chatData = useSelector((state) => state.chats.chatsData[chatId]);
   const userData = useSelector((state) => state.auth.userData);
 
+  const storedUsers = useSelector((state) => state.users.storedUsers);
+
   const initialState = {
     inputValues: { chatName: chatData.chatName },
     inputValidities: { chatName: undefined },
@@ -33,7 +36,7 @@ const ChatSettingScreen = (props) => {
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
   const inputChangeHandler = useCallback(
     (inputId, inputValue) => {
-      const result = validateLength(inputId, inputValue);
+      const result = validateInput(inputId, inputValue);
       dispatchFormState({
         inputId,
         validationResult: result,
@@ -83,13 +86,45 @@ const ChatSettingScreen = (props) => {
           autoCapitalize="none"
           initialValue={chatData.chatName}
           allowEmpty={false}
-          onInputChange={inputChangeHandler}
+          inputChangeHandler={inputChangeHandler}
+          errorText={formState.inputValidities["chatName"]}
         />
+        {showSuccessMessage && <Text>Saved!</Text>}
         {isLoading ? (
           <ActivityIndicator size={"small"} color={colors.primary} />
         ) : (
-          <Submitbutton title="Save changes" color={colors.primary} />
+          hasChanges() && (
+            <Submitbutton
+              title="Save changes"
+              color={colors.primary}
+              onPress={saveHandler}
+              disable={!formState.formIsValid}
+              style={{ marginTop: 10 }}
+            />
+          )
         )}
+
+        <View style={styles.sectionConatiner}>
+          <Text style={styles.heading}>
+            {chatData.users.length} Participants
+          </Text>
+          <DataItem title="Add users" icon="plus" type="button" />
+          {chatData.users.map((uid) => {
+            const currentUsers = storedUsers[uid];
+            return (
+              <DataItem
+                key={uid}
+                image={currentUsers.profilePicture}
+                title={`${currentUsers.firstName} ${currentUsers.lastName}`}
+                type={uid !== userData.userId && "link"}
+                onPress={() =>
+                  uid !== userData.userId &&
+                  props.navigation.navigate("Contact", { uid, chatId })
+                }
+              />
+            );
+          })}
+        </View>
       </ScrollView>
     </PageContainer>
   );
@@ -104,6 +139,16 @@ const styles = StyleSheet.create({
   scrollView: {
     justifyContent: "center",
     alignItems: "center",
+  },
+  sectionConatiner: {
+    width: "100%",
+    marginTop: 10,
+  },
+  heading: {
+    marginVertical: 8,
+    color: colors.textColor,
+    fontFamily: "bold",
+    letterSpacing: 0.3,
   },
 });
 export default ChatSettingScreen;

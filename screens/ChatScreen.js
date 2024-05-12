@@ -51,6 +51,7 @@ const ChatScreen = (props) => {
     if (!chatId) return [];
     const chatMessagesData = state.messages.messagesData[chatId];
     if (!chatMessagesData) return [];
+
     const messageList = [];
 
     for (const key in chatMessagesData) {
@@ -93,7 +94,7 @@ const ChatScreen = (props) => {
     );
   };
 
-  const title = (chatData = chatData.chatName ?? getChatTitleFromName());
+  const title = chatData.chatName ?? getChatTitleFromName();
 
   useEffect(() => {
     props.navigation.setOptions({
@@ -121,7 +122,7 @@ const ChatScreen = (props) => {
       },
     });
     setChatUsers(chatData.users);
-  }, [chatUsers]);
+  }, [chatUsers, title]);
 
   const pickImage = useCallback(async () => {
     try {
@@ -183,6 +184,7 @@ const ChatScreen = (props) => {
 
           {chatId && (
             <FlatList
+              showsVerticalScrollIndicator={false}
               ref={(ref) => (flatList.current = ref)}
               onContentSizeChange={() => flatList.current.scrollToEnd()}
               onLayout={() => flatList.current.scrollToEnd({ animated: false })}
