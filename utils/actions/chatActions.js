@@ -40,11 +40,15 @@ export const sendTextMessage = async (
   messageText,
   replyingTo
 ) => {
-  await sendMessage(chatId, senderId, messageText, null, replyingTo);
+  await sendMessage(chatId, senderId, messageText, null, replyingTo, null);
+};
+
+export const sendInfoMessage = async (chatId, senderId, messageText) => {
+  await sendMessage(chatId, senderId, messageText, null, null, "info");
 };
 
 export const sendImage = async (chatId, senderId, imageUrl, replyingTo) => {
-  await sendMessage(chatId, senderId, "Image", imageUrl, replyingTo);
+  await sendMessage(chatId, senderId, "Image", imageUrl, replyingTo, null);
 };
 
 const sendMessage = async (
@@ -52,7 +56,8 @@ const sendMessage = async (
   senderId,
   messageText,
   imageUrl,
-  replyingTo
+  replyingTo,
+  type
 ) => {
   const app = getFirebaseApp();
   const dbRef = ref(getDatabase(app));
@@ -71,6 +76,10 @@ const sendMessage = async (
     messageData.imageUrl = imageUrl;
   }
   await push(messageRef, messageData);
+
+  if (type) {
+    messageData.type = type;
+  }
 
   const chatRef = child(dbRef, `chats/${chatId}`);
   await update(chatRef, {
@@ -139,4 +148,10 @@ export const removeUserFromChat = async (
       break;
     }
   }
+
+  const messageText =
+    userLoggedInData.userId === userToRemoveData.userId
+      ? `${userLoggedInData.firstName} left the chat`
+      : `${userLoggedInData.firstName} removed ${userToRemoveData.firstName} from the chat`;
+  await sendInfoMessage(chatData, userLoggedInData.userId, messageText);
 };

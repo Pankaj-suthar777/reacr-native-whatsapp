@@ -126,6 +126,9 @@ const MainNavigator = () => {
           const data = chatSnapShots.val();
 
           if (data) {
+            if (!data.users.includes(userData.userId)) {
+              return;
+            }
             data.key = chatSnapShots.key;
 
             data.users.forEach((userId) => {
