@@ -18,6 +18,7 @@ import { commonStyle } from "../constants/commonStyle";
 import { setStoredUsers } from "../store/userSlice";
 import { setChatMessages, setStarMessages } from "../store/messagesSlice";
 import ContactScreen from "../screens/ContactScreen";
+import DataListScreen from "../screens/DataListScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,6 +90,14 @@ const StackNavigator = () => {
           component={ContactScreen}
           options={{
             headerTitle: "Contact Info",
+            headerBackTitle: "Back",
+          }}
+        />
+        <Stack.Screen
+          name="DataList"
+          component={DataListScreen}
+          options={{
+            headerTitle: "",
             headerBackTitle: "Back",
           }}
         />

@@ -30,6 +30,9 @@ const ChatSettingScreen = (props) => {
   const userData = useSelector((state) => state.auth.userData);
 
   const storedUsers = useSelector((state) => state.users.storedUsers);
+  const starredMessages = useSelector(
+    (state) => state.messages.starredMessages[chatId] ?? {}
+  );
 
   const initialState = {
     inputValues: { chatName: chatData.chatName },
@@ -82,7 +85,7 @@ const ChatSettingScreen = (props) => {
     } finally {
       setIsLoading(false);
     }
-  }, [props.navigation, isLoading]);
+  }, [props.navigation]);
 
   if (!chatData.users) return null;
 
@@ -126,7 +129,7 @@ const ChatSettingScreen = (props) => {
             {chatData.users.length} Participants
           </Text>
           <DataItem title="Add users" icon="plus" type="button" />
-          {chatData.users.map((uid) => {
+          {chatData.users.slice(0, 4).map((uid) => {
             const currentUsers = storedUsers[uid];
             return (
               <DataItem
@@ -141,7 +144,35 @@ const ChatSettingScreen = (props) => {
               />
             );
           })}
+
+          {chatData.users.length && (
+            <DataItem
+              type={"link"}
+              title="View all"
+              hideImage={true}
+              onPress={() =>
+                props.navigation.navigate("DataList", {
+                  title: "Participants",
+                  data: chatData.users,
+                  type: "users",
+                  chatId,
+                })
+              }
+            />
+          )}
         </View>
+        <DataItem
+          type={"link"}
+          title="Starred messages"
+          hideImage={true}
+          onPress={() =>
+            props.navigation.navigate("DataList", {
+              title: "Starred messages",
+              data: Object.values(starredMessages),
+              type: "messages",
+            })
+          }
+        />
       </ScrollView>
 
       {

@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useCallback, useReducer, useState } from "react";
+import React, { useCallback, useMemo, useReducer, useState } from "react";
 import PageTitle from "../components/PageTitle";
 import PageContainer from "../components/PageContainer";
 import Input from "../components/Input";
@@ -21,12 +21,27 @@ import {
 import colors from "../constants/colors";
 import { updateLoggedInData } from "../store/authSlice";
 import ProfileImage from "../components/ProfileImage";
+import DataItem from "../components/DataItem,";
 
-const SettingsScreen = () => {
+const SettingsScreen = (props) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const userData = useSelector((state) => state.auth.userData);
+  const starredMessages = useSelector(
+    (state) => state.messages.starredMessages ?? {}
+  );
+
+  const sortStarredMessage = useMemo(() => {
+    let result = [];
+    const chats = Object.values(starredMessages);
+    chats.forEach((chat) => {
+      const chatMessages = Object.values(chat);
+      result = result.concat(chatMessages);
+    });
+
+    return result;
+  }, [starredMessages]);
 
   const firstName = userData?.firstName || "";
   const lastName = userData?.lastName || "";
@@ -158,6 +173,18 @@ const SettingsScreen = () => {
             )
           )}
         </View>
+        <DataItem
+          type={"link"}
+          title="Starred messages"
+          hideImage={true}
+          onPress={() =>
+            props.navigation.navigate("DataList", {
+              title: "Starred messages",
+              data: sortStarredMessage,
+              type: "messages",
+            })
+          }
+        />
         <Submitbutton
           title="Logout"
           onPress={() => dispatch(userLogout())}
