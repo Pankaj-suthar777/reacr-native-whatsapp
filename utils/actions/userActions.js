@@ -4,6 +4,7 @@ import {
   get,
   getDatabase,
   orderByChild,
+  push,
   query,
   ref,
   remove,
@@ -60,12 +61,24 @@ export const getUserChats = async (userId) => {
   }
 };
 
-export const deleteUserChats = async (userId, key) => {
+export const deleteUserChat = async (userId, key) => {
   try {
     const app = getFirebaseApp();
     const dbRef = ref(getDatabase(app));
     const chatRef = child(dbRef, `userChats/${userId}/${key}`);
     await remove(chatRef);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
+
+export const addUserChat = async (userId, chatId) => {
+  try {
+    const app = getFirebaseApp();
+    const dbRef = ref(getDatabase(app));
+    const chatRef = child(dbRef, `userChats/${userId}`);
+    await push(chatRef, chatId);
   } catch (error) {
     console.log(error);
     throw error;

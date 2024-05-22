@@ -5,7 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import React, { useCallback, useReducer, useState } from "react";
+import React, { useCallback, useEffect, useReducer, useState } from "react";
 import { useSelector } from "react-redux";
 import PageContainer from "../components/PageContainer";
 import PageTitle from "../components/PageTitle";
@@ -13,6 +13,7 @@ import ProfileImage from "../components/ProfileImage";
 import Input from "../components/Input";
 import { reducer } from "../utils/reducers/formReducer";
 import {
+  addUsersToChat,
   removeUserFromChat,
   updateChatData,
 } from "../utils/actions/chatActions";
@@ -40,6 +41,27 @@ const ChatSettingScreen = (props) => {
     formIsValid: false,
   };
   const [formState, dispatchFormState] = useReducer(reducer, initialState);
+
+  const selectedUsers = props.route.params && props.route.params.selectedUsers;
+
+  useEffect(() => {
+    if (!selectedUsers) {
+      return;
+    }
+
+    const selectedUsersData = [];
+    selectedUsers.forEach((uid) => {
+      if (uid === userData.userId) return;
+      if (!storedUsers[uid]) {
+        console.log("No user data found in the data store");
+        return;
+      }
+      selectedUsersData.push(storedUsers[uid]);
+    });
+
+    addUsersToChat(userData, selectedUsersData, chatData);
+  }, [selectedUsers]);
+
   const inputChangeHandler = useCallback(
     (inputId, inputValue) => {
       const result = validateInput(inputId, inputValue);
@@ -128,7 +150,18 @@ const ChatSettingScreen = (props) => {
           <Text style={styles.heading}>
             {chatData.users.length} Participants
           </Text>
-          <DataItem title="Add users" icon="plus" type="button" />
+          <DataItem
+            title="Add users"
+            icon="plus"
+            type="button"
+            onPress={() =>
+              props.navigation.navigate("NewChat", {
+                isGroupChat: true,
+                existingUsers: chatData.users,
+                chatId,
+              })
+            }
+          />
           {chatData.users.slice(0, 4).map((uid) => {
             const currentUsers = storedUsers[uid];
             return (
