@@ -123,7 +123,8 @@ const ChatScreen = (props) => {
         id,
         userData.userId,
         messageText,
-        replyingTo && replyingTo.key
+        replyingTo && replyingTo.key,
+        chatUsers
       );
 
       setMessageText("");
@@ -173,9 +174,10 @@ const ChatScreen = (props) => {
 
       await sendImage(
         id,
-        userData.userId,
+        userData,
         uploadUrl,
-        replyingTo && replyingTo.key
+        replyingTo && replyingTo.key,
+        chatUsers
       );
       setReplyingTo(null);
 
